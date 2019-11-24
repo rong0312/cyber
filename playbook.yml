@@ -1,0 +1,63 @@
+- hosts: localhost
+  connection: localhost
+  gather_facts: false
+
+  vars:
+    group_name: name_example
+    ec2_name: ec2_test_ron
+    #ec2_region: eu-west-3 # USE if told to use a specific region.
+    ec2_ami: ami-0fab23d0250b9a47e # will change between regions.
+    ec2_instance_type: t2.micro
+    instance_count: 1
+
+  tasks:
+  - name: Fetch local public IP
+    ipify_facts:
+
+  - name: example ec2 group
+    ec2_group:
+      name: "{{ group_name }}"
+      description: an example EC2 group
+      vpc_id: vpc-0dadb0af629da9fba # use whe  there is not defalt VPC. ask them if there is no default how to fetch the needed vpc.
+      rules:
+        - proto: tcp
+          from_port: 80
+          to_port: 80
+          cidr_ip: "{{ ipify_public_ip }}/32"
+        - proto: tcp
+          from_port: 22
+          to_port: 22
+          cidr_ip: "{{ ipify_public_ip }}/32"
+        - proto: tcp
+          from_port: 22
+          to_port: 22
+          cidr_ip: 10.0.0.0/24 # change to ansible ip
+      rules_egress:
+        - proto: tcp
+          from_port: 80
+          to_port: 80
+          cidr_ip: 0.0.0.0/0
+        - proto: tcp
+          from_port: 443
+          to_port: 443
+          cidr_ip: 0.0.0.0/0
+
+  - name: Gather default region
+    shell: aws configure get region
+    register: default_region
+
+  - name: ec2 creation
+    ec2:
+      group: "{{ group_name }}"
+      instance_type: "{{ ec2_instance_type }}"
+      image: "{{ ec2_ami }}"
+      region: "{{ default_region.stdout }}" #this is ok, not all regions are supported! use this incase that default region is needed.
+      vpc_subnet_id: subnet-04affe8f844493ab8 # In case public IP is needed. ask them.
+      wait: yes
+      wait_timeout: 500
+      count: "{{ instance_count }}"
+      instance_tags: 
+       # Name: "{{ ec2_name }}"
+        EnvName: Test Environment
+      assign_public_ip: yes
+    register: ec2_instance
