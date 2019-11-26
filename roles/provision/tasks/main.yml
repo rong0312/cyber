@@ -64,8 +64,3 @@
     ansible_python_interpreter: '/usr/bin/python3'
   loop: "{{ ec2_instances.instances }}"
   no_log: True
-
-- debug:
-    msg: "Created instance with IP: {{ item.public_ip }}"
-  loop: "{{ ec2_instances.instances }}"
-  
