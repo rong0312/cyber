@@ -1,0 +1,21 @@
+---
+- name: apt update 
+  apt: 
+    update_cache: yes
+
+- name: Install apache2
+  apt: 
+    update_cache: yes
+    name: apache2 
+    state: latest
+
+- name: Create content to index.html
+  copy: 
+    content: "This is my private IP: {{ ansible_default_ipv4.address }}"
+    dest: /var/www/html/index.html
+
+- name: Start & enable apache2 service
+  service:
+    name: apache2
+    state: started
+    enabled: yes
