@@ -50,7 +50,7 @@
 - name: Wait up to 300 seconds for port 22 to become open
   wait_for:
     port: 22
-    host: "{{ item.public_ip }}"
+    host: "{{ item.private_ip }}"
   loop: "{{ ec2_instances.instances }}"
   no_log: True
 
