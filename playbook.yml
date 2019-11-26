@@ -12,97 +12,15 @@
     ec2_instance_ami: ami-0bb607148d8cf36fb 
     ec2_instance_type: t2.micro
     ec2_instance_count: 1
-    ec2_instance_env:
-      BOTO_USE_ENDPOINT_HEURISTICS: True
 
-  tasks:
-  - name: Create SG
-    ec2_group:
-      name: "{{ sg_group_name }}"
-      description: "{{ sg_group_name }}"
-      rules:
-        - proto: tcp
-          from_port: 80
-          to_port: 80
-          cidr_ip: "{{ local_pc_public_ip }}/32"
-        - proto: tcp
-          from_port: 22
-          to_port: 22
-          cidr_ip: "{{ local_pc_public_ip }}/32"
-        - proto: tcp
-          from_port: 22
-          to_port: 22
-          cidr_ip: "{{ ansible_internal_ip }}/32"
-      rules_egress:
-        - proto: tcp
-          from_port: 80
-          to_port: 80
-          cidr_ip: 0.0.0.0/0
-        - proto: tcp
-          from_port: 443
-          to_port: 443
-          cidr_ip: 0.0.0.0/0
-
-  - name: Upload public key to AWS
-    ec2_key:
-      name: "{{ key_name }}"
-      key_material: "{{ lookup('file', '~/.ssh/{{ key_name }}.pub') }}"
-
-  - name: Create ec2 instance
-    ec2:
-      group: "{{ sg_group_name }}"
-      key_name: "{{ key_name }}"
-      instance_type: "{{ ec2_instance_type }}"
-      image: "{{ ec2_instance_ami }}"
-      region: "{{ ec2_region }}"
-      wait: yes
-      wait_timeout: 500
-      count: "{{ ec2_instance_count }}"
-      instance_tags: 
-        EnvName: Test Environment
-    environment: "{{ ec2_instance_env }}"
-    register: ec2_instances
-
-  - name: Wait up to 300 seconds for port 22 to become open
-    wait_for:
-      port: 22
-      host: "{{ item.public_ip }}"
-    loop: "{{ ec2_instances.instances }}"
-
-  - name: Add instance public IP to host group  # cant use private as MAC as i dont have vpn. offer that1, try with private in ansible
-    add_host: 
-      hostname: "{{ item.public_ip }}"
-      groups: my_ec2
-      ansible_host: "{{ item.public_ip }}"
-      ansible_user: "{{ ec2_default_user }}"
-      ansible_ssh_private_key_file: "~/.ssh/{{ key_name }}"
-      ansible_python_interpreter: '/usr/bin/python3'
-    loop: "{{ ec2_instances.instances }}"
-
+  roles:
+    - provision
+  
 
 - hosts: my_ec2
   name: Deploy webserver
   become: yes
   gather_facts: true
 
-  tasks:
-  - name: apt update 
-    apt: 
-      update_cache: yes
-
-  - name: Install apache2
-    apt: 
-      update_cache: yes
-      name: apache2 
-      state: latest
-
-  - name: Create content to index.html
-    copy: 
-      content: "This is my private IP: {{ ansible_default_ipv4.address }}"
-      dest: /var/www/html/index.html
-
-  - name: Start & enable apache2 service
-    service:
-      name: apache2
-      state: started
-      enabled: yes
+  roles:
+    - deploy_web_app

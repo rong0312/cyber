@@ -52,7 +52,7 @@
     host: "{{ item.public_ip }}"
   loop: "{{ ec2_instances.instances }}"
 
-- name: Add instance public IP to host group  # cant use private as MAC as i dont have vpn. offer that1, try with private in ansible
+- name: Add instance public IP to host group
   add_host: 
     hostname: "{{ item.public_ip }}"
     groups: my_ec2
