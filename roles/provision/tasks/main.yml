@@ -2,6 +2,7 @@
 - name: Create SG
   ec2_group:
     name: "{{ sg_group_name }}"
+    region: "{{ ec2_region }}" 
     description: "{{ sg_group_name }}"
     rules:
       - proto: tcp
