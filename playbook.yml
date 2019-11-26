@@ -4,7 +4,7 @@
 
   vars:
     local_pc_public_ip: 77.126.63.26
-    ansible_internal_ip: 15.1.0.71
+    ansible_internal_ip: 15.188.172.129
     key_name: my_aws
     sg_group_name: challenge-sg
     ec2_default_user: "ubuntu"

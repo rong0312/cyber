@@ -50,15 +50,15 @@
 - name: Wait up to 300 seconds for port 22 to become open
   wait_for:
     port: 22
-    host: "{{ item.private_ip }}"
+    host: "{{ item.public_ip }}"
   loop: "{{ ec2_instances.instances }}"
   no_log: True
 
 - name: Add instance public IP to host group
   add_host: 
-    hostname: "{{ item.private_ip }}"
+    hostname: "{{ item.public_ip }}"
     groups: my_ec2
-    ansible_host: "{{ item.private_ip }}"
+    ansible_host: "{{ item.public_ip }}"
     ansible_user: "{{ ec2_default_user }}"
     ansible_ssh_private_key_file: "~/.ssh/{{ key_name }}"
     ansible_python_interpreter: '/usr/bin/python3'
