@@ -2,17 +2,8 @@
   connection: localhost
   gather_facts: false
 
-#   roles:
-#     - provision
-
-# - hosts: 
-#   gather_facts: false 
-#   roles:
-#     - deploy 
-
-
   vars:
-    local_pc_public_ip: 62.90.36.225
+    local_pc_public_ip: 77.126.63.26
     ansible_internal_ip: 15.1.0.71
     key_name: my_aws
     sg_group_name: challenge-sg
