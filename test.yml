@@ -7,14 +7,12 @@
 
 # - hosts: 
 #   gather_facts: false 
-    # vars:
-    #   ansible_ssh_private_key_file: "" 
 #   roles:
 #     - deploy 
 
 
   vars:
-    local_pc_public_ip: 77.126.63.26
+    local_pc_public_ip: 62.90.36.225
     ansible_internal_ip: 15.1.0.71
     key_name: my_aws
     sg_group_name: challenge-sg
@@ -67,7 +65,7 @@
       image: "{{ ec2_instance_ami }}"
       region: "{{ ec2_region }}"
       wait: yes
-      wait_timeout: 750
+      wait_timeout: 500
       count: "{{ ec2_instance_count }}"
       instance_tags: 
         EnvName: Test Environment
@@ -80,7 +78,7 @@
       host: "{{ item.public_ip }}"
     loop: "{{ ec2_instances.instances }}"
 
-  - name: Add instance public IP to host group
+  - name: Add instance public IP to host group  # cant use private as MAC as i dont have vpn. offer that1, try with private in ansible
     add_host: 
       hostname: "{{ item.public_ip }}"
       groups: my_ec2
