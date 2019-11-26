@@ -19,3 +19,5 @@ This playbook uses roles structure (two roles), please notice 'vars' inside the 
 **Playbook usage:**  
 To activate this playbook:  
 > sudo ansible-playbook playbook.yml
+
+**Log file:* /var/log/ansible.log
